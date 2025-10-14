@@ -1,0 +1,42 @@
+Using SharePoint for the Internal Chatbot and Data Pipeline
+
+1. Option A: SharePoint → Azure AI Search (Indexer) → AI Foundry
+- Create an Azure AI Search data source pointing to SharePoint sites/libraries via Microsoft Entra ID.
+- Add a skillset for text extraction (PDFs, DOCX, PPTX, XLSX), chunking, and embeddings.
+- Configure an indexer to run hourly or daily to keep the data fresh.
+- In Azure AI Foundry ("On your data"), attach the AI Search index as the retriever for the chatbot.
+
+Pros:
+- No custom ETL required.
+- Built-in chunking and embeddings.
+- Security trimming with Entra ID roles.
+
+Cons:
+- Bound by SharePoint/Graph API throttling limits.
+- Initial crawl can be slow for large libraries.
+
+2. Option B: SharePoint → (ADF/Logic Apps/Graph) → Blob/Lake → AI Search → AI Foundry
+- Use Azure Data Factory (ADF) or Logic Apps to extract data via Microsoft Graph API.
+- Sync only new or changed files (delta sync) from SharePoint to Azure Blob or Data Lake.
+- Store files in structured formats like CSV/Parquet for efficient processing.
+- Use Azure AI Search to index these files, then connect to AI Foundry as the retriever.
+
+Pros:
+- Full control over ETL, naming, and schema normalization.
+- Can pre-process Excel multi-sheet files before ingestion.
+- Easier debugging and monitoring via ADF logs.
+
+Cons:
+- Slightly more setup effort compared to direct indexing.
+
+3. Key Setup Considerations
+- Define scope: Select which sites, libraries, and file types to include (PDF, DOCX, XLSX, CSV).
+- Access and security: Use private endpoints, RBAC, and managed identities.
+- Incremental sync: Use Graph delta queries or scheduled indexers to avoid full reloads.
+- Excel handling: Flatten multi-sheet workbooks to CSV/Parquet using ADF or Fabric.
+- Throughput: Stagger jobs to respect API throttling; start with a pilot library.
+
+4. Recommended Architecture
+[SharePoint] → [ADF/Logic Apps] → [Azure Blob/Data Lake] → [Azure AI Search] → [Azure AI Foundry]
+
+Both options ensure your chatbot can securely and efficiently access internal documentation without open-source exposure.

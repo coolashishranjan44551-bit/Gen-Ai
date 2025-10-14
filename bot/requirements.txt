@@ -1,0 +1,27 @@
+# Core
+python-dotenv
+langchain>=0.2.12
+langchain-community>=0.2.10
+langchain-huggingface>=0.1.0
+langchain-unstructured>=0.1.0
+
+# Vector DB
+faiss-cpu
+
+# Loaders
+pypdf
+python-docx
+
+# Unstructured (general files) + Windows filetype helper
+unstructured
+python-magic-bin
+
+# HF + HTTP & certs helpers
+huggingface_hub>=0.35.0
+requests
+certifi
+truststore
+
+# Optional: FastAPI if you later expose an /ask endpoint
+# fastapi
+# uvicorn

@@ -1,0 +1,30 @@
+Azure AI Foundry – Internal Documentation Chatbot Pilot Plan
+
+Objective:
+Develop a secure, company-internal chatbot to query engineering documentation (code, infra, app dev) using Azure AI Foundry.
+
+1. Services & Components
+- Azure AI Foundry – for building prompt flows, orchestration, and RAG pipelines.
+- Azure OpenAI Service – GPT-4/4o models for generation.
+- Azure AI Search – for automatic document chunking, embedding, and retrieval.
+- Azure Blob Storage / SharePoint – data source integration for document ingestion.
+- Azure Monitor + Application Insights – to track usage and performance.
+
+2. Security & Compliance
+- Hosted within our Azure tenant; no external API exposure.
+- Data indexed only through private endpoints.
+- RBAC & managed identities to restrict access.
+- Alignment with internal security and compliance policies (no external LLM traffic).
+
+3. Estimated Costs (Pilot Scope)
+- Azure OpenAI tokens: ₹10–15K/month (depends on usage).
+- Azure AI Search (S1 tier): ₹5–8K/month.
+- Foundry / storage overhead: ₹3–5K/month.
+(Exact billing depends on scale and retention period.)
+
+4. Two-Week POC Checklist
+Week 1: Setup Azure AI Foundry workspace, connect OpenAI + AI Search, ingest 5–10 sample docs, validate embeddings.
+Week 2: Build Prompt Flow, test targeted Q&A over internal docs, configure RBAC, present demo to security & stakeholders.
+
+Outcome:
+A secure, functional prototype chatbot demonstrating document retrieval and Q&A using Azure AI Foundry’s built-in RAG and vector indexing—without open-source dependencies.
