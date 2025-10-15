@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: internal-knowledge-chatbot
+    env: docker
+    plan: starter
+    autoDeploy: false
+    envVars:
+      - key: HUGGINGFACEHUB_API_TOKEN
+        sync: false
+    disk:
+      name: chatbot-index
+      mountPath: /app/bot/index
+      sizeGB: 1

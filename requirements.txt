@@ -1,25 +1,20 @@
+# LangChain ecosystem
 langchain
 langchain-core
-
-# OpenAI Integration
 langchain-openai
-openai
-
-# Anthropic Integration
 langchain-anthropic
-
-# Google Gemini (PaLM) Integration
 langchain-google-genai
-google-generativeai
-
-# Hugging Face Integration
 langchain-huggingface
+
+# Hugging Face + transformers
 transformers
 huggingface-hub
 
-# Environment Variable Management
-python-dotenv
+# Web server
+fastapi
+uvicorn
 
-# Machine Learning Utilities
+# Utilities
+python-dotenv
 numpy
-scikit-learn 
+scikit-learn
