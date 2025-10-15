@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env*
+.git
+.gitignore
+.bot_env
+*.log
+index/
+.cache/
+.pytest_cache/
+.DS_Store
+bot/index/*.faiss
+bot/index/*.pkl
