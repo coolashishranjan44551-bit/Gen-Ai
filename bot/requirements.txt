@@ -22,6 +22,6 @@ requests
 certifi
 truststore
 
-# Optional: FastAPI if you later expose an /ask endpoint
-# fastapi
-# uvicorn
+# Web API
+fastapi
+uvicorn
