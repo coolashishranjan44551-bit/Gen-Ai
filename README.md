@@ -6,40 +6,20 @@ This repository contains several quick-start experiments for working with large 
 
 | Directory | Purpose |
 | --- | --- |
-| `bot/` | Retrieval-Augmented Generation (RAG) chatbot that indexes local documents into FAISS using Hugging Face endpoints for both embeddings and chat completion. Run `uvicorn bot.app:app --reload` for the web app or `python bot.py` for a terminal chatbot experience. |
+| `bot/` | Retrieval-Augmented Generation (RAG) chatbot that indexes local documents into FAISS using Hugging Face endpoints for both embeddings and chat completion. Run `python bot.py` for a terminal chatbot experience. |
 | `ChatModels/` | Minimal examples of calling OpenAI GPT-4 and Google Gemini chat models through LangChain. Useful for API smoke tests. |
 | `LLMs/` | Simple LLM completion demo using OpenAI's text completion interface. |
 | `requirements.txt` | Python dependencies used across the experiments. |
 
 The `bot/` package is the most complete implementation and will be the foundation for turning the terminal chatbot into a hosted experience.
 
-## Current RAG Bot Flow (`bot/rag_service.py`)
+## Current RAG Bot Flow (`bot/bot.py`)
 
 1. **Environment setup** – Loads `HUGGINGFACEHUB_API_TOKEN`, model IDs, and establishes the data/index folders.
 2. **Document ingestion** – Reads PDFs, DOCX, TXT, and Markdown files from `bot/data/` using `langchain-unstructured` loaders.
 3. **Chunking** – Splits documents into ~1k token chunks with overlap for better retrieval.
 4. **Embedding + Vector Store** – Generates embeddings via `HuggingFaceEndpointEmbeddings` and persists a FAISS index in `bot/index/`.
-5. **Conversational QA** – Wraps a Hugging Face hosted chat model (default `HuggingFaceH4/zephyr-7b-beta`) with LangChain's `RetrievalQA` chain.
-
-The reusable logic now lives in `bot/rag_service.py` and is shared by both the CLI (`bot/bot.py`) and the FastAPI web experience (`bot/app.py`).
-
-## Web Chatbot
-
-The FastAPI server exposes three endpoints:
-
-- `GET /` – Serves a lightweight web client that can run standalone or be embedded via an `<iframe>`.
-- `POST /chat` – Accepts `{ "question": "..." }` and returns an answer plus citations.
-- `GET /healthz` – Reports the startup status of the service.
-
-To launch the web experience locally:
-
-```bash
-export HUGGINGFACEHUB_API_TOKEN=your_token
-cd bot
-uvicorn bot.app:app --reload
-```
-
-Navigate to `http://127.0.0.1:8000` to chat over the indexed internal documents. The API and frontend are CORS-enabled so the widget can also be embedded in other sites by proxying requests to the `/chat` endpoint.
+5. **Conversational QA** – Wraps a Hugging Face hosted chat model (default `HuggingFaceH4/zephyr-7b-beta`) with LangChain's `RetrievalQA` chain and provides a CLI chat loop with source citations.
 
 ## Gaps to Address for a Production Chatbot
 
