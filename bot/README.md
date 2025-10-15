@@ -40,27 +40,6 @@ uvicorn bot.app:app --reload
 Open `http://127.0.0.1:8000` for the embedded web UI. To reuse the widget inside another
 site, proxy API requests to the `/chat` endpoint (CORS is open by default).
 
-## 🐳 Run with Docker
-
-```bash
-docker build -t internal-doc-chatbot ..
-docker run \
-  -p 8000:8000 \
-  -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
-  -v "$(pwd)/data:/app/bot/data" \
-  -v "$(pwd)/index:/app/bot/index" \
-  internal-doc-chatbot
-```
-
-The `data/` directory (documents) and `index/` directory (FAISS vectors) are mounted into the container so you can update
-content without rebuilding the image.
-
-## ☁️ Deploy to Render
-
-Import the repository into Render and let it auto-detect the included `Dockerfile` (or upload `render.yaml`). Set the
-`HUGGINGFACEHUB_API_TOKEN` environment variable and attach a persistent disk at `/app/bot/index` so the FAISS store is reused
-between deploys.
-
 ## 💬 cURL Example
 
 ```bash

@@ -6,76 +6,24 @@ This repository contains several quick-start experiments for working with large 
 
 | Directory | Purpose |
 | --- | --- |
-| `bot/` | Retrieval-Augmented Generation (RAG) chatbot that indexes local documents into FAISS using Hugging Face endpoints for both embeddings and chat completion. Run `uvicorn bot.app:app --reload` for the web app or `python bot.py` for a terminal chatbot experience. |
+| `bot/` | Retrieval-Augmented Generation (RAG) chatbot that indexes local documents into FAISS using Hugging Face endpoints for both embeddings and chat completion. Run `python bot.py` for a terminal chatbot experience. |
 | `ChatModels/` | Minimal examples of calling OpenAI GPT-4 and Google Gemini chat models through LangChain. Useful for API smoke tests. |
 | `LLMs/` | Simple LLM completion demo using OpenAI's text completion interface. |
 | `requirements.txt` | Python dependencies used across the experiments. |
 
 The `bot/` package is the most complete implementation and will be the foundation for turning the terminal chatbot into a hosted experience.
 
-## Current RAG Bot Flow (`bot/rag_service.py`)
+## Current RAG Bot Flow (`bot/bot.py`)
 
 1. **Environment setup** – Loads `HUGGINGFACEHUB_API_TOKEN`, model IDs, and establishes the data/index folders.
 2. **Document ingestion** – Reads PDFs, DOCX, TXT, and Markdown files from `bot/data/` using `langchain-unstructured` loaders.
 3. **Chunking** – Splits documents into ~1k token chunks with overlap for better retrieval.
 4. **Embedding + Vector Store** – Generates embeddings via `HuggingFaceEndpointEmbeddings` and persists a FAISS index in `bot/index/`.
-5. **Conversational QA** – Wraps a Hugging Face hosted chat model (default `HuggingFaceH4/zephyr-7b-beta`) with LangChain's `RetrievalQA` chain.
-
-The reusable logic now lives in `bot/rag_service.py` and is shared by both the CLI (`bot/bot.py`) and the FastAPI web experience (`bot/app.py`).
-
-## Web Chatbot
-
-The FastAPI server exposes three endpoints:
-
-- `GET /` – Serves a lightweight web client that can run standalone or be embedded via an `<iframe>`.
-- `POST /chat` – Accepts `{ "question": "..." }` and returns an answer plus citations.
-- `GET /healthz` – Reports the startup status of the service.
-
-To launch the web experience locally:
-
-```bash
-export HUGGINGFACEHUB_API_TOKEN=your_token
-cd bot
-uvicorn bot.app:app --reload
-```
-
-Navigate to `http://127.0.0.1:8000` to chat over the indexed internal documents. The API and frontend are CORS-enabled so the widget can also be embedded in other sites by proxying requests to the `/chat` endpoint.
-
-## Deploying the Web Chatbot
-
-### Option 1 – Docker (local or any container host)
-
-```bash
-# Build the image
-docker build -t internal-doc-chatbot .
-
-# Run it locally with your docs mounted in
-docker run \
-  -p 8000:8000 \
-  -e HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
-  -v "$(pwd)/bot/data:/app/bot/data" \
-  -v "$(pwd)/bot/index:/app/bot/index" \
-  internal-doc-chatbot
-```
-
-The container will automatically load (or rebuild) the FAISS index from `/app/bot/data`. Mounting the `bot/index/` folder preserves the vector store across restarts.
-
-### Option 2 – Render.com (one-click style deploy)
-
-1. Push this repository (or your fork) to GitHub.
-2. Create a new [Render Web Service](https://render.com/docs/web-services) and point it at the repo.
-3. Choose **Docker** as the environment. Render will use the provided `Dockerfile`.
-4. When prompted for configuration, either import the supplied `render.yaml` or manually set:
-   - **Start Command** – leave empty (handled by the Dockerfile).
-   - **Environment Variables** – add `HUGGINGFACEHUB_API_TOKEN` with your Hugging Face Inference API key.
-   - **Persistent Disk** – mount `/app/bot/index` so the FAISS index survives deploys (the `render.yaml` defines a 1GB disk by default).
-5. Click **Create Web Service**. Render will build the image and launch `uvicorn` automatically. The public URL serves both the API (`/chat`, `/healthz`) and web widget (`/`).
-
-For other PaaS providers (Railway, Fly.io, Azure Container Apps, etc.) you can reuse the same container image. Just be sure to supply the `HUGGINGFACEHUB_API_TOKEN` environment variable and mount storage for `/app/bot/index` if you want to avoid rebuilding the index on every start.
+5. **Conversational QA** – Wraps a Hugging Face hosted chat model (default `HuggingFaceH4/zephyr-7b-beta`) with LangChain's `RetrievalQA` chain and provides a CLI chat loop with source citations.
 
 ## Gaps to Address for a Production Chatbot
 
-- **Web UI polish** – The bundled widget is intentionally lightweight. Add authentication, custom branding, and analytics before shipping broadly.
+- **No web UI** – The existing bot is CLI-only. We need a frontend that can be embedded into any website or launched as a standalone app.
 - **Document management** – Documents must currently be copied manually into `bot/data/`. Consider adding upload APIs, scheduled re-indexing, and multi-tenant storage.
 - **Authentication & access control** – Protect internal documents and optionally scope retrieval per user.
 - **Deployment** – Package the service as a web API with persistent storage and containerized deployment.
@@ -106,9 +54,9 @@ For other PaaS providers (Railway, Fly.io, Azure Container Apps, etc.) you can r
 
 ## Next Steps
 
-- [x] Refactor `bot/bot.py` into service modules.
-- [x] Scaffold a FastAPI server with chat and health endpoints.
-- [x] Prototype a simple web chat widget consuming the API.
-- [x] Document deployment and configuration in the README.
+- [ ] Refactor `bot/bot.py` into service modules.
+- [ ] Scaffold a FastAPI server with chat and health endpoints.
+- [ ] Prototype a simple web chat widget consuming the API.
+- [ ] Document deployment and configuration in the README.
 
 This plan will convert the current CLI proof-of-concept into an embeddable or standalone web-based chatbot powered entirely by Hugging Face-hosted models.
